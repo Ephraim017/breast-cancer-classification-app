@@ -1,0 +1,369 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Image - Breast Cancer Classification{% endblock %}
+
+{% block extra_css %}
+<style>
+    .upload-section {
+        background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+        color: white;
+        padding: 60px 0;
+    }
+
+    .upload-card {
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        border: none;
+    }
+
+    .file-upload-wrapper {
+        position: relative;
+        overflow: hidden;
+        display: inline-block;
+        width: 100%;
+    }
+
+    .file-upload-input {
+        position: absolute;
+        left: -9999px;
+    }
+
+    .file-upload-label {
+        display: block;
+        padding: 60px 20px;
+        border: 3px dashed #dee2e6;
+        border-radius: 15px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+    }
+
+    .file-upload-label:hover {
+        border-color: var(--primary-color);
+        background: rgba(233, 30, 99, 0.05);
+    }
+
+    .file-upload-label.dragover {
+        border-color: var(--primary-color);
+        background: rgba(233, 30, 99, 0.1);
+    }
+
+    .upload-icon {
+        font-size: 4rem;
+        color: var(--primary-color);
+        margin-bottom: 20px;
+    }
+
+    .upload-text {
+        font-size: 1.2rem;
+        color: var(--text-color);
+        margin-bottom: 10px;
+    }
+
+    .upload-hint {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .preview-container {
+        margin-top: 20px;
+        text-align: center;
+        display: none;
+    }
+
+    .preview-image {
+        max-width: 100%;
+        max-height: 300px;
+        border-radius: 10px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .file-info {
+        margin-top: 15px;
+        padding: 15px;
+        background: #e7f3ff;
+        border-radius: 10px;
+        display: none;
+    }
+
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
+
+    .loading-content {
+        background: white;
+        padding: 40px;
+        border-radius: 20px;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Upload Section -->
+<section class="upload-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="text-center mb-5">
+                    <h1 class="display-5 fw-bold mb-3">
+                        <i class="fas fa-upload me-3"></i>
+                        Upload Histological Image
+                    </h1>
+                    <p class="lead">
+                        Upload a breast histological image for AI-powered classification analysis
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Upload Form -->
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="upload-card">
+                    <form id="uploadForm" method="POST" enctype="multipart/form-data" action="{{ url_for('upload_file') }}">
+                        <div class="file-upload-wrapper">
+                            <input type="file" 
+                                   id="fileInput" 
+                                   name="file" 
+                                   class="file-upload-input" 
+                                   accept="image/*" 
+                                   required>
+                            <label for="fileInput" class="file-upload-label" id="fileLabel">
+                                <div class="upload-icon">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                </div>
+                                <div class="upload-text">
+                                    Click to select an image or drag and drop
+                                </div>
+                                <div class="upload-hint">
+                                    Supported formats: PNG, JPG, JPEG, GIF, BMP, TIFF (Max 16MB)
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="preview-container" id="previewContainer">
+                            <img id="previewImage" class="preview-image" alt="Preview">
+                        </div>
+
+                        <div class="file-info" id="fileInfo">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>File Name:</strong> <span id="fileName"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>File Size:</strong> <span id="fileSize"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-custom btn-lg" id="analyzeBtn" disabled>
+                                <i class="fas fa-brain me-2"></i>
+                                Analyze Image
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Instructions -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <h3 class="text-center mb-4">Upload Instructions</h3>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="d-flex mb-3">
+                            <div class="me-3">
+                                <i class="fas fa-image text-primary fa-2x"></i>
+                            </div>
+                            <div>
+                                <h5>Image Quality</h5>
+                                <p class="text-muted mb-0">
+                                    Upload high-quality histological images for best results. 
+                                    Clear, well-focused images provide more accurate analysis.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex mb-3">
+                            <div class="me-3">
+                                <i class="fas fa-file-image text-primary fa-2x"></i>
+                            </div>
+                            <div>
+                                <h5>Supported Formats</h5>
+                                <p class="text-muted mb-0">
+                                    We support PNG, JPG, JPEG, GIF, BMP, and TIFF formats. 
+                                    Maximum file size is 16MB.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex mb-3">
+                            <div class="me-3">
+                                <i class="fas fa-shield-alt text-primary fa-2x"></i>
+                            </div>
+                            <div>
+                                <h5>Privacy & Security</h5>
+                                <p class="text-muted mb-0">
+                                    Your uploaded images are processed securely and are not stored 
+                                    permanently on our servers.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex mb-3">
+                            <div class="me-3">
+                                <i class="fas fa-clock text-primary fa-2x"></i>
+                            </div>
+                            <div>
+                                <h5>Processing Time</h5>
+                                <p class="text-muted mb-0">
+                                    Analysis typically takes a few seconds. Results include 
+                                    classification and confidence scores.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-content">
+        <div class="spinner-border text-primary spinner-border-custom mb-4" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <h4>Analyzing Image...</h4>
+        <p class="text-muted mb-0">Please wait while our AI processes your image</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('fileInput');
+    const fileLabel = document.getElementById('fileLabel');
+    const previewContainer = document.getElementById('previewContainer');
+    const previewImage = document.getElementById('previewImage');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const uploadForm = document.getElementById('uploadForm');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+
+    // File input change handler
+    fileInput.addEventListener('change', handleFileSelect);
+
+    // Drag and drop handlers
+    fileLabel.addEventListener('dragover', handleDragOver);
+    fileLabel.addEventListener('dragleave', handleDragLeave);
+    fileLabel.addEventListener('drop', handleDrop);
+
+    // Form submit handler
+    uploadForm.addEventListener('submit', handleFormSubmit);
+
+    function handleFileSelect(e) {
+        const file = e.target.files[0];
+        if (file) {
+            processFile(file);
+        }
+    }
+
+    function handleDragOver(e) {
+        e.preventDefault();
+        fileLabel.classList.add('dragover');
+    }
+
+    function handleDragLeave(e) {
+        e.preventDefault();
+        fileLabel.classList.remove('dragover');
+    }
+
+    function handleDrop(e) {
+        e.preventDefault();
+        fileLabel.classList.remove('dragover');
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            fileInput.files = files;
+            processFile(files[0]);
+        }
+    }
+
+    function processFile(file) {
+        // Validate file type
+        const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/bmp', 'image/tiff'];
+        if (!allowedTypes.includes(file.type)) {
+            alert('Please select a valid image file (PNG, JPG, JPEG, GIF, BMP, TIFF)');
+            return;
+        }
+
+        // Validate file size (16MB = 16 * 1024 * 1024 bytes)
+        if (file.size > 16 * 1024 * 1024) {
+            alert('File size must be less than 16MB');
+            return;
+        }
+
+        // Show file info
+        fileName.textContent = file.name;
+        fileSize.textContent = formatFileSize(file.size);
+        fileInfo.style.display = 'block';
+
+        // Show image preview
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImage.src = e.target.result;
+            previewContainer.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+
+        // Enable analyze button
+        analyzeBtn.disabled = false;
+    }
+
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    function handleFormSubmit(e) {
+        // Show loading overlay
+        loadingOverlay.style.display = 'flex';
+    }
+});
+</script>
+{% endblock %}

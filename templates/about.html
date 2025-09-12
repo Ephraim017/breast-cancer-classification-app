@@ -1,0 +1,311 @@
+{% extends "base.html" %}
+
+{% block title %}About - Breast Cancer Classification{% endblock %}
+
+{% block content %}
+<!-- About Header -->
+<section class="hero-section">
+    <div class="container">
+        <h1 class="hero-title">
+            <i class="fas fa-info-circle me-3"></i>
+            About Our Technology
+        </h1>
+        <p class="hero-subtitle">
+            Learn about the AI technology behind breast cancer classification
+        </p>
+    </div>
+</section>
+
+<!-- About Content -->
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <!-- Technology Overview -->
+                <div class="feature-card mb-5">
+                    <h3 class="text-primary mb-4">
+                        <i class="fas fa-brain me-2"></i>
+                        AI Technology Overview
+                    </h3>
+                    <p class="lead mb-4">
+                        Our breast cancer classification system uses a ResNet50-based deep learning model 
+                        trained on the BreakHis dataset to analyze histological images and classify them 
+                        as benign or malignant. ResNet50 was selected as the best-performing architecture 
+                        after comprehensive testing of multiple models.
+                    </p>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-primary">Key Features:</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    ResNet50-based transfer learning
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Pre-trained on ImageNet for better feature extraction
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Real-time image analysis
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Superior accuracy and confidence scoring
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-primary">Technical Specifications:</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <strong>Input Size:</strong> 128x128 pixels
+                                </li>
+                                <li class="mb-2">
+                                    <strong>Architecture:</strong> ResNet50 + Custom Head
+                                </li>
+                                <li class="mb-2">
+                                    <strong>Framework:</strong> TensorFlow/Keras
+                                </li>
+                                <li class="mb-2">
+                                    <strong>Training Dataset:</strong> BreakHis v1
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Model Architecture -->
+                <div class="feature-card mb-5">
+                    <h3 class="text-primary mb-4">
+                        <i class="fas fa-sitemap me-2"></i>
+                        Model Architecture
+                    </h3>
+                    <p class="mb-4">
+                        Our model is based on ResNet50, a proven deep residual network architecture that 
+                        excelled in comprehensive testing against other state-of-the-art models including 
+                        EfficientNetV2B0, InceptionV3, and VGG16.
+                    </p>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <h5 class="text-primary">ResNet50 Base Model:</h5>
+                            <ul class="mb-4">
+                                <li>50-layer deep residual network</li>
+                                <li>Pre-trained on ImageNet dataset</li>
+                                <li>Residual connections for better gradient flow</li>
+                                <li>Global Average Pooling for feature aggregation</li>
+                            </ul>
+                            
+                            <h5 class="text-primary">Custom Classification Head:</h5>
+                            <ul class="mb-4">
+                                <li>Dense layer with 256 neurons and ReLU activation</li>
+                                <li>L2 regularization (0.02) to prevent overfitting</li>
+                                <li>Dropout layer (60%) for regularization</li>
+                                <li>Output layer with 2 neurons (binary classification)</li>
+                            </ul>
+                        </div>
+                        <div class="col-lg-6">
+                            <h5 class="text-primary">Training Configuration:</h5>
+                            <ul class="mb-4">
+                                <li>Optimizer: Adam with learning rate 1e-5</li>
+                                <li>Loss function: Categorical crossentropy</li>
+                                <li>Metrics: Accuracy, Precision, Recall, AUC</li>
+                                <li>Data augmentation: rotation, zoom, flips</li>
+                            </ul>
+                            
+                            <h5 class="text-primary">Model Selection Process:</h5>
+                            <ul class="mb-4">
+                                <li>Tested 4 different architectures</li>
+                                <li>ResNet50 showed superior performance</li>
+                                <li>Comprehensive evaluation on BreakHis dataset</li>
+                                <li>Best accuracy and F1-score results</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dataset Information -->
+                <div class="feature-card mb-5">
+                    <h3 class="text-primary mb-4">
+                        <i class="fas fa-database me-2"></i>
+                        Dataset Information
+                    </h3>
+                    <p class="mb-4">
+                        The model is trained on the BreakHis dataset, a comprehensive collection 
+                        of breast histological images.
+                    </p>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-primary">Dataset Details:</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <strong>Name:</strong> BreakHis v1
+                                </li>
+                                <li class="mb-2">
+                                    <strong>Images:</strong> 7,909 microscopic images
+                                </li>
+                                <li class="mb-2">
+                                    <strong>Classes:</strong> Benign and Malignant
+                                </li>
+                                <li class="mb-2">
+                                    <strong>Magnifications:</strong> 40X, 100X, 200X, 400X
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-primary">Sample Distribution:</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <strong>Benign:</strong> 2,480 images
+                                </li>
+                                <li class="mb-2">
+                                    <strong>Malignant:</strong> 5,429 images
+                                </li>
+                                <li class="mb-2">
+                                    <strong>Format:</strong> PNG images
+                                </li>
+                                <li class="mb-2">
+                                    <strong>Resolution:</strong> Various sizes (normalized to 128x128)
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Metrics -->
+                <div class="feature-card mb-5">
+                    <h3 class="text-primary mb-4">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        Model Performance
+                    </h3>
+                    <p class="mb-4">
+                        Our model has been evaluated using standard machine learning metrics 
+                        to ensure reliable performance:
+                    </p>
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <div class="stats-value">~92%</div>
+                                <div class="text-muted">Accuracy</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <div class="stats-value">~90%</div>
+                                <div class="text-muted">Precision</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <div class="stats-value">~94%</div>
+                                <div class="text-muted">Recall</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <div class="stats-value">~0.95</div>
+                                <div class="text-muted">AUC Score</div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-muted mt-3 text-center">
+                        <small>* ResNet50 performance metrics based on comprehensive model comparison study</small>
+                    </p>
+                </div>
+
+                <!-- Usage Guidelines -->
+                <div class="feature-card mb-5">
+                    <h3 class="text-primary mb-4">
+                        <i class="fas fa-guidelines me-2"></i>
+                        Usage Guidelines
+                    </h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-success">Best Practices:</h5>
+                            <ul class="text-success">
+                                <li>Use high-quality histological images</li>
+                                <li>Ensure proper image format (PNG, JPG, etc.)</li>
+                                <li>Images should be well-focused and clear</li>
+                                <li>Consider multiple opinions for critical decisions</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-danger">Limitations:</h5>
+                            <ul class="text-danger">
+                                <li>Not a replacement for professional diagnosis</li>
+                                <li>Performance may vary with image quality</li>
+                                <li>Should not be used for clinical decisions</li>
+                                <li>Requires validation by medical professionals</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Call to Action -->
+                <div class="text-center">
+                    <h4 class="mb-4">Ready to Try Our AI Classification?</h4>
+                    <a href="{{ url_for('upload_file') }}" class="btn btn-custom btn-lg me-3">
+                        <i class="fas fa-upload me-2"></i>
+                        Upload Image
+                    </a>
+                    <a href="{{ url_for('index') }}" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-home me-2"></i>
+                        Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Technical References -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <h3 class="text-center mb-5">Technical References</h3>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="feature-card h-100">
+                            <h5 class="text-primary">
+                                <i class="fas fa-book me-2"></i>
+                                Research Papers
+                            </h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <strong>BreakHis Dataset:</strong> Spanhol et al. (2016)
+                                </li>
+                                <li class="mb-2">
+                                    <strong>CNN Architectures:</strong> LeCun et al. (1989)
+                                </li>
+                                <li class="mb-2">
+                                    <strong>Medical Image Analysis:</strong> Litjens et al. (2017)
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="feature-card h-100">
+                            <h5 class="text-primary">
+                                <i class="fas fa-tools me-2"></i>
+                                Technologies Used
+                            </h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <strong>Backend:</strong> Python, Flask, TensorFlow
+                                </li>
+                                <li class="mb-2">
+                                    <strong>Frontend:</strong> HTML5, CSS3, Bootstrap 5
+                                </li>
+                                <li class="mb-2">
+                                    <strong>Image Processing:</strong> OpenCV, PIL
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

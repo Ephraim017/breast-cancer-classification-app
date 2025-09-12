@@ -1,0 +1,400 @@
+{% extends "base.html" %}
+
+{% block title %}Analysis Results - Breast Cancer Classification{% endblock %}
+
+{% block extra_css %}
+<style>
+    .results-section {
+        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        padding: 60px 0;
+    }
+
+    .result-card {
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        border: none;
+        margin-bottom: 30px;
+    }
+
+    .result-image {
+        max-width: 100%;
+        max-height: 400px;
+        border-radius: 15px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        object-fit: contain;
+    }
+
+    .classification-result {
+        padding: 30px;
+        border-radius: 15px;
+        text-align: center;
+        margin: 20px 0;
+        border: 3px solid;
+        background: white;
+    }
+
+    .result-benign {
+        border-color: var(--success-color);
+        background: linear-gradient(135deg, #d4edda, #c3e6cb);
+        color: #155724;
+    }
+
+    .result-malignant {
+        border-color: var(--danger-color);
+        background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+        color: #721c24;
+    }
+
+    .confidence-score {
+        font-size: 3rem;
+        font-weight: bold;
+        margin: 20px 0;
+    }
+
+    .risk-badge {
+        font-size: 1.2rem;
+        padding: 10px 20px;
+        border-radius: 25px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .risk-low {
+        background: var(--success-color);
+        color: white;
+    }
+
+    .risk-moderate {
+        background: var(--warning-color);
+        color: #212529;
+    }
+
+    .risk-high {
+        background: var(--danger-color);
+        color: white;
+    }
+
+    .probability-bar {
+        height: 30px;
+        border-radius: 15px;
+        position: relative;
+        background: #e9ecef;
+        overflow: hidden;
+        margin: 10px 0;
+    }
+
+    .probability-fill {
+        height: 100%;
+        border-radius: 15px;
+        transition: width 0.8s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+    }
+
+    .prob-benign {
+        background: linear-gradient(90deg, var(--success-color), #20c997);
+    }
+
+    .prob-malignant {
+        background: linear-gradient(90deg, var(--danger-color), #e74c3c);
+    }
+
+    .stats-card {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 15px 0;
+        text-align: center;
+        border: 1px solid #dee2e6;
+    }
+
+    .stats-value {
+        font-size: 2rem;
+        font-weight: bold;
+        color: var(--primary-color);
+    }
+
+    .action-buttons {
+        text-align: center;
+        margin-top: 30px;
+    }
+
+    .btn-action {
+        margin: 10px;
+        padding: 12px 30px;
+        border-radius: 25px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .recommendation-box {
+        background: #fff3cd;
+        border: 1px solid #ffeeba;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+    }
+
+    .pulse-animation {
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+
+    .probability-dynamic-width {
+        transition: width 0.8s ease;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Results Header -->
+<section class="results-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="text-center">
+                    <h1 class="display-5 fw-bold mb-3">
+                        <i class="fas fa-chart-line me-3"></i>
+                        Analysis Results
+                    </h1>
+                    <p class="lead">
+                        AI-powered classification of your histological image
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Results Content -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Image Display -->
+            <div class="col-lg-6">
+                <div class="result-card">
+                    <h4 class="mb-4 text-center">
+                        <i class="fas fa-image me-2"></i>
+                        Analyzed Image
+                    </h4>
+                    <div class="text-center">
+                        <img src="{{ url_for('static', filename=image_path) }}" 
+                             alt="Analyzed histological image" 
+                             class="result-image">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Display -->
+            <div class="col-lg-6">
+                <div class="result-card">
+                    <h4 class="mb-4 text-center">
+                        <i class="fas fa-brain me-2"></i>
+                        Classification Results
+                    </h4>
+
+                    <!-- Main Classification Result -->
+                    <div class="classification-result {% if result.predicted_class == 'Benign' %}result-benign{% else %}result-malignant{% endif %} pulse-animation">
+                        <h2 class="mb-3">
+                            {% if result.predicted_class == 'Benign' %}
+                                <i class="fas fa-check-circle me-2"></i>
+                            {% else %}
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                            {% endif %}
+                            {{ result.predicted_class }}
+                        </h2>
+                        <div class="confidence-score">
+                            {{ "%.1f"|format(result.confidence * 100) }}%
+                        </div>
+                        <p class="mb-3">Confidence Score</p>
+                        
+                        <!-- Risk Level Badge -->
+                        <span class="risk-badge 
+                            {% if result.risk_level == 'Low Risk' %}risk-low
+                            {% elif result.risk_level == 'Moderate Risk' %}risk-moderate
+                            {% else %}risk-high{% endif %}">
+                            {{ result.risk_level }}
+                        </span>
+                    </div>
+
+                    <!-- Detailed Probabilities -->
+                    <div class="mt-4">
+                        <h5 class="mb-3">Probability Breakdown</h5>
+                        
+                        <!-- Benign Probability -->
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span><strong>Benign:</strong></span>
+                                <span>{{ "%.1f"|format(result.benign_probability * 100) }}%</span>
+                            </div>
+                            <div class="probability-bar">
+                                <div class="probability-fill prob-benign" 
+                                     data-width="{{ result.benign_probability * 100 }}">
+                                    {% if result.benign_probability > 0.3 %}
+                                        {{ "%.1f"|format(result.benign_probability * 100) }}%
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Malignant Probability -->
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span><strong>Malignant:</strong></span>
+                                <span>{{ "%.1f"|format(result.malignant_probability * 100) }}%</span>
+                            </div>
+                            <div class="probability-bar">
+                                <div class="probability-fill prob-malignant" 
+                                     data-width="{{ result.malignant_probability * 100 }}">
+                                    {% if result.malignant_probability > 0.3 %}
+                                        {{ "%.1f"|format(result.malignant_probability * 100) }}%
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Information -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <!-- Recommendations -->
+                <div class="recommendation-box">
+                    <h5 class="mb-3">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        Recommendations
+                    </h5>
+                    {% if result.predicted_class == 'Benign' %}
+                        <p class="mb-2">
+                            <strong>Result indicates benign tissue.</strong> This suggests the tissue sample 
+                            shows characteristics consistent with non-cancerous cells.
+                        </p>
+                        <ul class="mb-0">
+                            <li>Continue regular screening as recommended by healthcare professionals</li>
+                            <li>Maintain healthy lifestyle practices</li>
+                            <li>Consult with your doctor about appropriate follow-up</li>
+                        </ul>
+                    {% else %}
+                        <p class="mb-2">
+                            <strong>Result indicates malignant characteristics.</strong> This suggests the tissue 
+                            sample shows features that may be consistent with cancerous cells.
+                        </p>
+                        <ul class="mb-0">
+                            <li>Immediate consultation with an oncologist is recommended</li>
+                            <li>Additional diagnostic tests may be necessary</li>
+                            <li>Early detection improves treatment outcomes significantly</li>
+                        </ul>
+                    {% endif %}
+                </div>
+
+                <!-- Statistics Summary -->
+                <div class="row mt-4">
+                    <div class="col-md-3">
+                        <div class="stats-card">
+                            <div class="stats-value">{{ "%.1f"|format(result.confidence * 100) }}%</div>
+                            <div class="text-muted">Confidence</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stats-card">
+                            <div class="stats-value">{{ result.predicted_class }}</div>
+                            <div class="text-muted">Classification</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stats-card">
+                            <div class="stats-value">{{ result.risk_level.split()[0] }}</div>
+                            <div class="text-muted">Risk Level</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stats-card">
+                            <div class="stats-value">AI</div>
+                            <div class="text-muted">CNN Model</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <a href="{{ url_for('upload_file') }}" class="btn btn-custom btn-action">
+                        <i class="fas fa-upload me-2"></i>
+                        Analyze Another Image
+                    </a>
+                    <a href="{{ url_for('index') }}" class="btn btn-outline-primary btn-action">
+                        <i class="fas fa-home me-2"></i>
+                        Back to Home
+                    </a>
+                    <button onclick="window.print()" class="btn btn-outline-secondary btn-action">
+                        <i class="fas fa-print me-2"></i>
+                        Print Results
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Important Disclaimer -->
+<section class="py-4 bg-danger bg-opacity-10">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="alert alert-danger border-0 mb-0">
+                    <h5 class="alert-heading">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Critical Medical Disclaimer
+                    </h5>
+                    <p class="mb-0">
+                        <strong>This AI analysis is for research and educational purposes only.</strong> 
+                        It is not a substitute for professional medical diagnosis or treatment. 
+                        Always consult with qualified healthcare professionals for medical decisions. 
+                        Do not delay seeking medical advice based on these results.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Animate probability bars on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const probBars = document.querySelectorAll('.probability-fill');
+    
+    probBars.forEach(bar => {
+        const width = bar.dataset.width + '%';
+        bar.style.width = '0%';
+        
+        setTimeout(() => {
+            bar.style.width = width;
+        }, 500);
+    });
+});
+
+// Print functionality
+window.addEventListener('beforeprint', function() {
+    document.body.classList.add('printing');
+});
+
+window.addEventListener('afterprint', function() {
+    document.body.classList.remove('printing');
+});
+</script>
+{% endblock %}
