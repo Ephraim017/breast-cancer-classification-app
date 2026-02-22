@@ -20,6 +20,9 @@ MAX_FILE_SIZE = 16 * 1024 * 1024  # 16MB
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE
 
+# Ensure upload directory exists (needed when running via gunicorn)
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
 # Initialize the classifier
 try:
     # Try to load a pre-trained model if it exists
@@ -163,8 +166,6 @@ def internal_error(e):
     return render_template('500.html'), 500
 
 if __name__ == '__main__':
-    # Ensure upload directory exists
-    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    
-    # Run the app
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    port = int(os.environ.get('PORT', 5000))
+    debug = os.environ.get('DEBUG', 'False') == 'True'
+    app.run(debug=debug, host='0.0.0.0', port=port)
