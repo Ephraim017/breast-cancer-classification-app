@@ -59,6 +59,9 @@ class BreastCancerClassifier:
         
         # Try to load trained model first
         trained_model_paths = [
+            'models/resnet50_breast_cancer_final.keras',
+            'models/best_resnet50_model.keras',
+            'models/resnet50_model.keras',
             'resnet50_breast_cancer_final.keras',
             'best_resnet50_model.keras',
             'resnet50_model.keras',

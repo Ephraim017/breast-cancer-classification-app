@@ -173,13 +173,15 @@ ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
 
-# Model files (too large for GitHub)
-*.keras
+# Model files (too large for GitHub - use MODEL_URL env var for deployment)
 *.h5
+*.keras
 *.pb
 *.onnx
 *.tflite
-models/
+# Allow files committed inside the models/ directory
+!models/
+!models/*
 model_files/
 saved_models/
 
