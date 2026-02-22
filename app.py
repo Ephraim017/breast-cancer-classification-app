@@ -1,5 +1,6 @@
 import os
 import uuid
+import urllib.request
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
 from werkzeug.utils import secure_filename
 from model_utils import BreastCancerClassifier
@@ -20,14 +21,31 @@ MAX_FILE_SIZE = 16 * 1024 * 1024  # 16MB
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE
 
-# Ensure upload directory exists (needed when running via gunicorn)
+# Ensure required directories exist (needed when running via gunicorn)
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs('models', exist_ok=True)
+
+# Download trained model from MODEL_URL if provided and not already present
+MODEL_PATH = 'models/resnet50_breast_cancer_final.keras'
+model_url = os.environ.get('MODEL_URL')
+if model_url and not os.path.exists(MODEL_PATH):
+    if not model_url.startswith('https://'):
+        logger.error("MODEL_URL must use HTTPS. Skipping model download.")
+    else:
+        try:
+            logger.info("Downloading model from MODEL_URL ...")
+            urllib.request.urlretrieve(model_url, MODEL_PATH)
+            logger.info(f"Model downloaded successfully to {MODEL_PATH}")
+        except urllib.error.HTTPError as e:
+            logger.error(f"HTTP error downloading model (status {e.code}): {e.reason}")
+        except urllib.error.URLError as e:
+            logger.error(f"Network error downloading model: {e.reason}")
+        except OSError as e:
+            logger.error(f"File system error saving model (check disk space): {e}")
 
 # Initialize the classifier
 try:
-    # Try to load a pre-trained model if it exists
-    model_path = 'models/breast_cancer_model.keras'
-    classifier = BreastCancerClassifier(model_path if os.path.exists(model_path) else None)
+    classifier = BreastCancerClassifier(MODEL_PATH if os.path.exists(MODEL_PATH) else None)
     logger.info("Classifier initialized successfully")
 except Exception as e:
     logger.error(f"Error initializing classifier: {e}")
